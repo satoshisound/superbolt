@@ -58,7 +58,7 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
 
    It is in the best interest of nodes to ensure they are able to route payments, and automation of this process will make it more manageable for node operators to route payments with a very high degree of success.
 
-4. **Uniform fee:** Ideally, payments sent on the network would be subject to a uniform float or percentage fee regardless of hops involved in routing the payment. Would it be possible to have the payer find the best route, count the number of hops between payer and payee, and then split the predetermined fee by that many nodes? A naive Python function to achieve this end might look like:
+4. **Uniform fee:** Ideally, payments sent on the network would be subject to a uniform flat or percentage fee regardless of hops involved in routing the payment. Would it be possible to have the payer find the best route, count the number of hops between payer and payee, and then split the predetermined fee by that many nodes? A naive Python function to achieve this end might look like:
    ```python
    def split_fee_by_total_hops(payer, payee, amount, fee_percentage):
        best_route = get_best_route(payer, payee, amount)
