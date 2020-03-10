@@ -44,7 +44,7 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
    - **Please note:** Additional node classes (larger or smaller) may be beneficial to network performance. However, to maintain sufficient decentralization, it may be beneficial to have a maximum node capitalization limit.
 3. **Channel balancing:** To ensure that channels do not become stuck from inbound/outbound liquidity snags, the protocol would include some scripting to automate channel rebalancing.
 
-   - [Circular payments](https://github.com/lightningnetwork/lnd/pull/3736) should be feasable given the connectivity requirements outlined above. A naive algorithm to utilize circular rebalancing opportunities in Python:
+   - [Circular payments](https://github.com/lightningnetwork/lnd/pull/3736) should be feasible given the connectivity requirements outlined above. A naive algorithm to utilize circular rebalancing opportunities in Python:
      ```python
      for channel in channels:
          if channel.local_balance >= (channel.total_capacity * 0.75):
@@ -54,7 +54,7 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
              # Args: From channel, to channel, payment amount
              circular_payment(channel, lowest_balance_channel, payment_amount)
      ```
-   - [Loop](https://github.com/lightninglabs/loop) would be used only if circular payments are not feasable and channels become eggresiously imbalanced (perhaps > 90%).
+   - [Loop](https://github.com/lightninglabs/loop) would be used only if circular payments are not feasible and channels become egregiously imbalanced (perhaps > 90%).
 
    It is in the best interest of nodes to ensure they are able to route payments, and automation of this process will make it more manageable for node operators to route payments with a very high degree of success.
 
@@ -77,7 +77,7 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
 Given the above, anyone using SBN/LN/BTC would have a close to 100% guarantee that their payment would be successfully routed from any given SBN Access Node to any other SBN Access Node up to a reasonable network-defined maximum (perhaps 0.025 BTC ~= $215 with BTC at $8600). We can be confident of this because:
 
 1. Channel capacity is sufficient such that any one payment is an order of magnitude smaller than the nearest chokepoint (0.25 BTC outbound from AN to RN while maximum payment would be 0.025 BTC). We still need to do the hard math on this, but intuition tells us that the probability of all participants connected to any given AN attempting to route payments from said AN at the same time would approach 0%.
-2. In the event that an AN or RN node channel capacity becomes unbalanced (i.e. Node A = 0 BTC, Node B = 1 BTC in given channel), channels should typically be able to use [circular](https://github.com/lightningnetwork/lnd/pull/3736) payments to unstick capacity given that nodes are sufficiently connected with common piers. In the event that off-chain rebalancing is impossible, [Loop](https://github.com/lightninglabs/loop) may be used. Ideally, both approaches would be automated such that rebalancing occurs if node liquidity is stuck in either direction beyond a reasonable threshold (<25% of total channel capacity).
+2. In the event that an AN or RN node channel capacity becomes unbalanced (i.e. Node A = 0 BTC, Node B = 1 BTC in given channel), channels should typically be able to use [circular](https://github.com/lightningnetwork/lnd/pull/3736) payments to unstick capacity given that nodes are sufficiently connected with common peers. In the event that off-chain rebalancing is impossible, [Loop](https://github.com/lightninglabs/loop) may be used. Ideally, both approaches would be automated such that rebalancing occurs if node liquidity is stuck in either direction beyond a reasonable threshold (<25% of total channel capacity).
 3. Nodes are incentivized to stay online ready to route payments and ostracized for insufficient uptime.
 
 The user experience envisioned with this protocol would be one where a user would go to pay with Lightning, look for the Superbolt logo, and know with near certainty that their payment will be successful. This is the experience today with processors like Visa and Mastercard and it seems unlikely that LN will achieve similar levels of reliability unless some additional requirements such as those proposed here are added to the LN/BTC stack.
