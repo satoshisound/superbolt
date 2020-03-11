@@ -58,15 +58,7 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
 
    It is in the best interest of nodes to ensure they are able to route payments, and automation of this process will make it more manageable for node operators to route payments with a very high degree of success.
 
-4. **Uniform fee:** Ideally, payments sent on the network would be subject to a uniform flat or percentage fee regardless of hops involved in routing the payment. Would it be possible to have the payer find the best route, count the number of hops between payer and payee, and then split the predetermined fee by that many nodes? A naive Python function to achieve this end might look like:
-   ```python
-   def split_fee_by_total_hops(payer, payee, amount, fee_percentage):
-       best_route = get_best_route(payer, payee, amount)
-       fee_amount = amount * fee_percentage
-       per_hop_fee = fee_amount/(best_route.hops - 1)
-       return per_hop_fee
-   ```
-5. **Self Attestation:** To be accepted as an SBN member, a node needs only to give these proofs to anyone who asks:
+4. **Self Attestation:** To be accepted as an SBN member, a node needs only to give these proofs to anyone who asks:
    - **Proof of uptime** --- by the above **Uptime** mechanism.
    - **Proof of connectivity** ---- need to prove peer/non-peer node connection requirements are met and that these nodes are SBN members.
    - **Proof of liquidity** --- which can be attested to by the Bitcoin blockchain and the LN gossip system.
@@ -81,3 +73,7 @@ Given the above, anyone using SBN/LN/BTC would have a close to 100% guarantee th
 3. Nodes are incentivized to stay online ready to route payments and ostracized for insufficient uptime.
 
 The user experience envisioned with this protocol would be one where a user would go to pay with Lightning, look for the Superbolt logo, and know with near certainty that their payment will be successful. This is the experience today with processors like Visa and Mastercard and it seems unlikely that LN will achieve similar levels of reliability unless some additional requirements such as those proposed here are added to the LN/BTC stack.
+
+#### Credits:
+
+Self-attestation for node uptime using OpenTimeStamps - [ZmnSCPxj](https://zmnscpxj.github.io/index.html)
