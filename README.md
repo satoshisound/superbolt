@@ -38,10 +38,34 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
    - The asker will disbelieve them unless the set of signatures attested on OpenTimeStamps is large enough.
    - To ensure that nodes have strong incentive to maintain high uptime, a node would be considered a valid SBN member if it can show 998 signatures within the last 1008 blocks (7 days).
    - In addition, optionally, nodes could also monitor connections using [chanfitness](https://github.com/lightningnetwork/lnd/pull/3332) from [lnd v0.9.0-beta](https://blog.lightning.engineering/announcement/2020/01/22/lnd-v0.9.html) and remove connections to nodes which fall below their own more stringent standards.
-2. **Connectivity/Liquidity:** Distinct and uniform LN node classes with commensurate total node and per channel liquidity requirements. To begin, two node classes are proposed with minimum capacity requirements.
-   - **Routing Node (RN):** 4 BTC total node capacity, 4 x 1 BTC channels (0.5 BTC per side) to other RNs, 8 x 0.5 BTC (0.25 BTC per side) channels to ANs. 3 of 4 RN connections should be with shared peers (i.e. A => B => C => A) while the 4th connection should be with an RN without shared peers to ensure the network is sufficiently connected (so that a group of nodes are not sequestered away from the larger network).
-   - **Access Node (AN):** 1 BTC total node capacity, 2 x 0.5 BTC channels (0.25 BTC per side) to RNs. 10 x 0.1 BTC channels (0.05 BTC per side) to regular LN wallets/individual users/etc. RNs should be peers to allow off chain rebalancing via circular payments.
-   - **Please note:** Additional node classes (larger or smaller) may be beneficial to network performance. However, to maintain sufficient decentralization, it may be beneficial to have a maximum node capitalization limit.
+2. **Connectivity/Liquidity:** Connectivity and liquidity requirements include uniform LN node and channel classes with minimum total node and per channel liquidity minimums. Four channel classes and two node classes are proposed with the following requirements.
+
+   A. **Channel Classes**:
+
+   - **100m** - 100m sats (1 BTC) total channel capacity (0.5 BTC per side)
+   - **50m** - 50m sats (0.5 BTC) total channel capacity (0.25 BTC per side)
+   - **10m** - 10m sats (0.1 BTC) total channel capacity (0.05 BTC per side)
+   - **1m** - 1m sats (0.01 BTC) total channel capacity (0.005 BTC per side)
+
+   B. **Node Classes:**
+
+   - **Routing Node (RN):**
+
+     1. Minimum of 4 - **100m** channels to other RNs (2 BTC)
+
+        - 3 of 4 RN connections should be between nodes with shared peers (i.e. A => B => C => A)
+        - 4th connection should be with an RN without shared peers to ensure the network is sufficiently connected (so that any one group of nodes is not sequestered away from the larger network)
+
+     2. Minimum of 2 BTC used in any combination of **50m**, **10m**, or **1m** channels to vanilla LN or ANs
+
+   - **Access Node (AN):**
+
+     1. Minimum of 2 - **50m** channels to RNS (0.5 total BTC)
+
+        - RNs should be peers to allow off-chain rebalancing via circular payments
+
+     2. Minimum of 0.5 BTC used in any combination of **10m** or **1m** class channels to vanilla LN nodes
+
 3. **Channel balancing:** To ensure that channels do not become stuck from inbound/outbound liquidity snags, the protocol would include some scripting to automate channel rebalancing.
 
    - [Circular payments](https://github.com/lightningnetwork/lnd/pull/3736) should be feasible given the connectivity requirements outlined above. A naive algorithm to utilize circular rebalancing opportunities in Python:
@@ -60,17 +84,16 @@ We are proposing a LN BOLT, called Superbolt Network (SBN). Conceptually, this m
 
 4. **Self Attestation:** To be accepted as an SBN member, a node needs only to give these proofs to anyone who asks:
    - **Proof of uptime** --- by the above **Uptime** mechanism.
-   - **Proof of connectivity** ---- need to prove peer/non-peer node connection requirements are met and that these nodes are SBN members.
-   - **Proof of liquidity** --- which can be attested to by the Bitcoin blockchain and the LN gossip system.
-   - **Proof of channel management** --- is there a way to self-attest to keeping channels balanced? Perhaps this is not necessary, but would be nice to have.
+   - **Proof of connectivity** ---- by proving peer/non-peer node connection requirements are met and that these nodes are SBN members.
+   - **Proof of liquidity** --- can be attested to by the Bitcoin blockchain and the LN gossip system.
 
 ### Why?
 
-Given the above, anyone using SBN/LN/BTC would have a close to 100% guarantee that their payment would be successfully routed from any given SBN Access Node to any other SBN Access Node up to a reasonable network-defined maximum (perhaps 0.025 BTC ~= $215 with BTC at $8600). We can be confident of this because:
+Given the above, anyone using SBN/LN/BTC would have a close to 100% guarantee that their payment would be successfully routed from any given SBN Access Node or Routing Node to any other SBN Access Node or Routing Node up to a reasonable network-defined maximum (0.025 BTC). We can be confident of this because:
 
 1. Channel capacity is sufficient such that any one payment is an order of magnitude smaller than the nearest chokepoint (0.25 BTC outbound from AN to RN while maximum payment would be 0.025 BTC). We still need to do the hard math on this, but intuition tells us that the probability of all participants connected to any given AN attempting to route payments from said AN at the same time would approach 0%.
 2. In the event that an AN or RN node channel capacity becomes unbalanced (i.e. Node A = 0 BTC, Node B = 1 BTC in given channel), channels should typically be able to use [circular](https://github.com/lightningnetwork/lnd/pull/3736) payments to unstick capacity given that nodes are sufficiently connected with common peers. In the event that off-chain rebalancing is impossible, [Loop](https://github.com/lightninglabs/loop) may be used. Ideally, both approaches would be automated such that rebalancing occurs if node liquidity is stuck in either direction beyond a reasonable threshold (<25% of total channel capacity).
-3. Nodes are incentivized to stay online ready to route payments and ostracized for insufficient uptime.
+3. Nodes are incentivized to stay online ready to route payments and ostracized for insufficient uptime, connectivity, etc.
 
 The user experience envisioned with this protocol would be one where a user would go to pay with Lightning, look for the Superbolt logo, and know with near certainty that their payment will be successful. This is the experience today with processors like Visa and Mastercard and it seems unlikely that LN will achieve similar levels of reliability unless some additional requirements such as those proposed here are added to the LN/BTC stack.
 
